@@ -11,7 +11,7 @@ public class ApplicationConfig {
         return new BookRepository();
     }
 
-    //의존성주입을 하지 않고 @Autowird사용
+    //의존성주입을 하지 않고 @Autowired사용
     @Bean
     public BookService bookService(){
         return new BookService();
