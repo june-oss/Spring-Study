@@ -1,23 +1,35 @@
 package com.june.tobyspring.dao;
 
 import com.june.tobyspring.domain.User;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import javax.security.auth.login.AccountNotFoundException;
+import javax.sql.DataSource;
 import java.sql.*;
 
 public class UserDAO {
 
 //    private SimpleConnectionMaker SimpleConnectionMakernectionMaker;
     //인터페이스 이용
-    private ConnectionMaker connectionMaker;
+    private DataSource dataSource; //초기에 설정하면 사용중에 변화지 않는 읽기전용 인스턴스 변수.
 
-    public UserDAO(ConnectionMaker connectionMaker){
-//        simpleConnectionMaker = new SimpleConnectionMaker();
-        this.connectionMaker = connectionMaker;
+    public UserDAO(){};
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    public void add(User user) throws ClassNotFoundException, SQLException{
+    public UserDAO(DataSource dataSource){
+//        simpleConnectionMaker = new SimpleConnectionMaker();
+//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        this.dataSource = dataSource;
+    }
+
+
+    public void add(User user) throws SQLException{
 //        Connection c = simpleConnectionMaker.makeNewConnection();
-        Connection c = connectionMaker.makeConnection();
+        Connection c = dataSource.getConnection();
 
         PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
         ps.setString(1, user.getId());
@@ -30,15 +42,16 @@ public class UserDAO {
         c.close();
     }
 
-    public User get(String id) throws ClassNotFoundException, SQLException{
+    public User get(String id) throws SQLException{
 //        Connection c = simpleConnectionMaker.makeNewConnection();
-        Connection c = connectionMaker.makeConnection();
+        Connection c = dataSource.getConnection();
 
         PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
         ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
         rs.next();
+
         User user = new User();
         user.setId(rs.getString("id"));
         user.setName(rs.getString("name"));

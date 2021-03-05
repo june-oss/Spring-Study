@@ -1,14 +1,21 @@
 package com.june.tobyspring.dao;
 
 import com.june.tobyspring.domain.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
 
 public class UserDAOTest {
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        ConnectionMaker connectionMaker = new DConnectionMaker();
 
-        UserDAO dao = new UserDAO(connectionMaker);
+    @Test
+    public void addAndGet() throws SQLException {
+//        ConnectionMaker connectionMaker = new DConnectionMaker();
+//        UserDAO dao = new DaoFactory().userDAO();
+
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDAO dao = context.getBean("userDAO", UserDAO.class);
 
         User user = new User();
         user.setId("mlicp");
@@ -17,12 +24,6 @@ public class UserDAOTest {
 
         dao.add(user);
 
-        System.out.println(user.getId() + " 등록 성공");
 
-        User user2 = dao.get(user.getId());
-        System.out.println(user2.getName());
-        System.out.println(user2.getPassword());
-
-        System.out.println(user2.getId() + " 조회 성공");
     }
 }
