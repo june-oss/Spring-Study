@@ -3,6 +3,7 @@ package com.june.tobyspring.dao;
 import com.june.tobyspring.domain.User;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.sql.DataSource;
@@ -50,18 +51,22 @@ public class UserDAO {
         ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
-        rs.next();
-
-        User user = new User();
-        user.setId(rs.getString("id"));
-        user.setName(rs.getString("name"));
-        user.setPassword(rs.getString("password"));
+        User user = null;
+        if(rs.next()){
+            user = new User();
+            user.setId(rs.getString("id"));
+            user.setName(rs.getString("name"));
+            user.setPassword(rs.getString("password"));
+        }
 
         rs.close();
         ps.close();
         c.close();
 
+        if (user == null) throw new EmptyResultDataAccessException(1);
+
         return user;
+
     }
 
     public void deleteAll() throws SQLException{
