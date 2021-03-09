@@ -14,12 +14,9 @@ public class UserDAO {
 //    private SimpleConnectionMaker SimpleConnectionMakernectionMaker;
     //인터페이스 이용
     private DataSource dataSource; //초기에 설정하면 사용중에 변화지 않는 읽기전용 인스턴스 변수.
+    private JdbcContext jdbcContext;
 
     public UserDAO(){};
-
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     public UserDAO(DataSource dataSource){
 //        simpleConnectionMaker = new SimpleConnectionMaker();
@@ -27,20 +24,33 @@ public class UserDAO {
         this.dataSource = dataSource;
     }
 
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcContext = new JdbcContext();
 
-    public void add(User user) throws SQLException{
-//        Connection c = simpleConnectionMaker.makeNewConnection();
-        Connection c = dataSource.getConnection();
+        this.jdbcContext.setDataSource(dataSource);
 
-        PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
-        ps.setString(1, user.getId());
-        ps.setString(2, user.getName());
-        ps.setString(3, user.getPassword());
+        this.dataSource = dataSource;
+    }
 
-        ps.executeUpdate();
+    public void setJdbcContext(JdbcContext jdbcContext){
+        this.jdbcContext = jdbcContext;
+    }
 
-        ps.close();
-        c.close();
+    public void add(final User user) throws SQLException{
+        this.jdbcContext.workWithStatementStrategy(
+            new StatementStrategy() {
+                @Override
+                public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                    PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
+
+                    ps.setString(1, user.getId());
+                    ps.setString(2, user.getName());
+                    ps.setString(3, user.getPassword());
+
+                    return ps;
+                }
+            }
+        );
     }
 
     public User get(String id) throws SQLException{
@@ -70,31 +80,69 @@ public class UserDAO {
     }
 
     public void deleteAll() throws SQLException{
-        Connection c = dataSource.getConnection();
-
-        PreparedStatement ps = c.prepareStatement("delete from users");
-
-        ps.executeUpdate();
-
-        ps.close();
-        c.close();
+        this.jdbcContext.executeSql("delete from users");
     }
+
 
     public int getCount() throws SQLException{
-        Connection c = dataSource.getConnection();
+        Connection c = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-        PreparedStatement ps = c.prepareStatement("select count(*) from users");
+        try {
+            c = dataSource.getConnection();
 
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        int count = rs.getInt(1);
+            ps = c.prepareStatement("select count(*) from users");
 
-        rs.close();
-        ps.close();
-        c.close();
+            rs = ps.executeQuery();
+            rs.next();
 
-        return count;
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw  e;
+        } finally {
+            if (rs != null) { try { rs.close(); } catch (SQLException e) {} }
+            if (ps != null){ try { ps.close(); } catch (SQLException e) {} }
+            if (c != null){ try { c.close(); } catch (SQLException e) {} }
+        }
     }
+
+//    //JdbcContext에 public method로 옮겼다.
+//    public void executeSql(final String query) throws SQLException{
+//        this.jdbcContext.workWithStatementStrategy(
+//            new StatementStrategy() {
+//                @Override
+//                public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+//                    return c.prepareStatement(query);
+//                }
+//            }
+//        );
+//    }
+
+//    //JdbcContext class로 분리시킴
+//    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException{
+//        Connection c = null;
+//        PreparedStatement ps = null;
+//
+//        try{
+//            c = dataSource.getConnection();
+//
+//            ps = stmt.makePreparedStatement(c);
+//
+//            ps.executeUpdate();
+//        } catch (SQLException e) {
+//            throw e;
+//        } finally {
+//            if (ps != null){ try { ps.close(); } catch (SQLException e) {} }
+//            if (c != null){ try { c.close(); } catch (SQLException e) {} }
+//        }
+//    }
+
+//    private PreparedStatement makeStatement(Connection c) throws  SQLException{
+//        PreparedStatement ps;
+//        ps = c.prepareStatement("delete from users");
+//        return ps;
+//    }
 
 //    //중복 코드의 메소드 추출
 //    private Connection getConnection() throws ClassNotFoundException, SQLException{
