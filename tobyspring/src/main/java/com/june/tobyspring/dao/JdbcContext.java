@@ -4,7 +4,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+//jdbc Template가 이런기능을한다.
 public class JdbcContext {
 
     private DataSource dataSource;
