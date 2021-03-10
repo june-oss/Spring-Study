@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.RowMapper;
 import javax.security.auth.login.AccountNotFoundException;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
 
 public class UserDAO {
 
@@ -113,6 +114,20 @@ public class UserDAO {
 //                return rs.getInt();
 //            }
 //        });
+    }
+
+    public List<User> getAll() {
+        return this.jdbcTemplate.query("select * from users order by id",
+                new RowMapper<User>() {
+                    @Override
+                    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        User user = new User();
+                        user.setId(rs.getString("id"));
+                        user.setName(rs.getString("name"));
+                        user.setPassword(rs.getString("password"));
+                        return user;
+                    }
+                });
     }
 
 //    //JdbcContext에 public method로 옮겼다.
