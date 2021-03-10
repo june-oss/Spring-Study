@@ -3,9 +3,12 @@ package com.june.tobyspring.dao;
 import com.june.tobyspring.domain.User;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.sql.DataSource;
@@ -49,28 +52,41 @@ public class UserDAO {
     }
 
     public User get(String id) throws SQLException{
-//        Connection c = simpleConnectionMaker.makeNewConnection();
-        Connection c = dataSource.getConnection();
 
-        PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
-        ps.setString(1, id);
-
-        ResultSet rs = ps.executeQuery();
-        User user = null;
-        if(rs.next()){
-            user = new User();
-            user.setId(rs.getString("id"));
-            user.setName(rs.getString("name"));
-            user.setPassword(rs.getString("password"));
-        }
-
-        rs.close();
-        ps.close();
-        c.close();
-
-        if (user == null) throw new EmptyResultDataAccessException(1);
-
-        return user;
+        return this.jdbcTemplate.queryForObject("select * from users where id = ?",
+                new Object[]{id},
+                new RowMapper<User>() {
+                    @Override
+                    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        User user = new User();
+                        user.setId(rs.getString("id"));
+                        user.setName(rs.getString("name"));
+                        user.setPassword(rs.getString("password"));
+                        return user;
+                    }
+                })
+////        Connection c = simpleConnectionMaker.makeNewConnection();
+//        Connection c = dataSource.getConnection();
+//
+//        PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+//        ps.setString(1, id);
+//
+//        ResultSet rs = ps.executeQuery();
+//        User user = null;
+//        if(rs.next()){
+//            user = new User();
+//            user.setId(rs.getString("id"));
+//            user.setName(rs.getString("name"));
+//            user.setPassword(rs.getString("password"));
+//        }
+//
+//        rs.close();
+//        ps.close();
+//        c.close();
+//
+//        if (user == null) throw new EmptyResultDataAccessException(1);
+//
+//        return user;
 
     }
 
@@ -88,26 +104,21 @@ public class UserDAO {
 
 
     public int getCount() throws SQLException{
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        //queryForInt is duplicated!
+        return this.jdbcTemplate.queryForObject("select count(*) from users", Integer.class);
 
-        try {
-            c = dataSource.getConnection();
-
-            ps = c.prepareStatement("select count(*) from users");
-
-            rs = ps.executeQuery();
-            rs.next();
-
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            throw  e;
-        } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException e) {} }
-            if (ps != null){ try { ps.close(); } catch (SQLException e) {} }
-            if (c != null){ try { c.close(); } catch (SQLException e) {} }
-        }
+//        return this.jdbcTemplate.query(new PreparedStatementCreator() {
+//            @Override
+//            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+//                return con.prepareStatement("select count(*) from users");
+//            }
+//        }, new ResultSetExtractor<Integer>() {
+//            @Override
+//            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
+//                rs.next();
+//                return rs.getInt();
+//            }
+//        });
     }
 
 //    //JdbcContext에 public method로 옮겼다.
