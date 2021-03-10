@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
-public class UserDAO {
+public class UserDaoJdbc implements UserDao {
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

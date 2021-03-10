@@ -1,7 +1,6 @@
 package com.june.tobyspring.dao;
 
 import com.june.tobyspring.domain.User;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
@@ -12,7 +11,7 @@ public class UserDaoConnectionCountingTest {
 
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(CountingDaoFactory.class);
 
-        UserDAO dao = context.getBean("userDao", UserDAO.class);
+        UserDaoJdbc dao = context.getBean("userDao", UserDaoJdbc.class);
 
         User user = new User();
         user.setId("mlicp");

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -16,9 +17,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 @SpringJUnitConfig(DaoFactory.class)//@ContextConfiguration
-public class UserDAOTest {
+public class UserDaoTest {
     @Autowired
-    private UserDAO dao;
+    private UserDaoJdbc dao;
     private User user1, user2, user3;
 
     @BeforeEach //junit @Before와 동일 -- 각 테스트 메서드 전에 실행된다.
@@ -34,7 +35,7 @@ public class UserDAOTest {
 
 
     @Test
-    void addAndGet() throws SQLException {
+    void addAndGet() {
         dao.deleteAll();
         assertEquals(dao.getCount(), 0);
 
@@ -52,7 +53,7 @@ public class UserDAOTest {
     }
 
     @Test
-    public void count() throws SQLException{
+    public void count() {
         dao.deleteAll();
         assertEquals(dao.getCount(), 0);
 
@@ -67,7 +68,7 @@ public class UserDAOTest {
     }
 
     @Test
-    public void getUserFailure() throws SQLException{
+    public void getUserFailure() {
         dao.deleteAll();
         assertEquals(dao.getCount(), 0);
 
@@ -77,7 +78,7 @@ public class UserDAOTest {
     }
 
     @Test
-    public void getAll() throws SQLException {
+    public void getAll() {
         dao.deleteAll();
 
         List<User> users0 = dao.getAll();
@@ -106,6 +107,16 @@ public class UserDAOTest {
         assertThat(user1.getId(), is(user2.getId()));
         assertThat(user1.getName(), is(user2.getName()));
         assertThat(user1.getPassword(), is(user2.getPassword()));
+    }
+
+    @Test
+    public void duplicateKey(){
+        dao.deleteAll();
+
+        dao.add(user1);
+        assertThrows(DataAccessException.class,() -> {
+            dao.add(user1);
+        });
     }
 
 }
