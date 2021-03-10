@@ -30,14 +30,8 @@ public class UserDAO {
         this.dataSource = dataSource;
     }
 
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     public void setDataSource(DataSource dataSource) {
-        this.jdbcContext = new JdbcContext();
-
-        this.jdbcContext.setDataSource(dataSource);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
 
         this.dataSource = dataSource;
     }
@@ -48,7 +42,7 @@ public class UserDAO {
 
     public void add(final User user) throws SQLException{
         this.jdbcTemplate.update("insert into users(id, name, password) values(?,?,?)",
-                user.getId(), user, user.getName(), user.getPassword());
+                user.getId(), user.getName(), user.getPassword());
     }
 
     public User get(String id) throws SQLException{
@@ -64,7 +58,7 @@ public class UserDAO {
                         user.setPassword(rs.getString("password"));
                         return user;
                     }
-                })
+                });
 ////        Connection c = simpleConnectionMaker.makeNewConnection();
 //        Connection c = dataSource.getConnection();
 //
