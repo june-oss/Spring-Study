@@ -1,7 +1,7 @@
 package com.june.tobyspring.user.domain;
 
 public enum Level {
-    BASIC(1, SILVER), SILVER(2, GOLD), GOLD(3, null);
+    GOLD(3, null), SILVER(2, GOLD), BASIC(1, SILVER);
 
     private final int value;
     private final Level next;
