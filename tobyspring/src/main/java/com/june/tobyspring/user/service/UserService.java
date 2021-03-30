@@ -20,10 +20,10 @@ public class UserService {
     public static final int MIN_RECOMMEND_FOR_GOLD = 30;
     UserDao userDao;
 
-    private DataSource dataSource;
+    private PlatformTransactionManager transactionManager;
 
-    public void setDateSource(DataSource dataSource){
-        this.dataSource = dataSource;
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
     }
 
     public void setUserDao(UserDao userDao){
@@ -31,18 +31,16 @@ public class UserService {
     }
 
     public void upgradeLevels() throws Exception{
-        PlatformTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
-
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+        TransactionStatus status = this.transactionManager.getTransaction(new DefaultTransactionDefinition());
         try{
             List<User> users = userDao.getAll();
             for(User user: users){
                 if(canUpgradeLevel(user))
                     upgradeLevel(user);
             }
-            transactionManager.commit(status);
+            this.transactionManager.commit(status);
         }catch (Exception e){
-            transactionManager.rollback(status);
+            this.transactionManager.rollback(status);
             throw e;
         }
     }

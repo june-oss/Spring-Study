@@ -3,7 +3,9 @@ package com.june.tobyspring.user.dao;
 import com.june.tobyspring.user.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.TransactionManager;
 
 import javax.sql.DataSource;
 
@@ -36,14 +38,18 @@ public class AppConfiguration {
 
         UserService userService = new UserService();
         userService.setUserDao(userDAO());
-        userService.setDateSource(dataSource());
+        userService.setTransactionManager(transactionManager());
 
         return userService;
     }
 
-
     @Bean
-    public ConnectionMaker connectionMaker(){
-        return new DConnectionMaker();
+    public DataSourceTransactionManager transactionManager(){
+
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+        transactionManager.setDataSource(dataSource());
+
+        return transactionManager;
     }
+
 }
