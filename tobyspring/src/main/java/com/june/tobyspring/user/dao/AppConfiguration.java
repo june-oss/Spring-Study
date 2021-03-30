@@ -36,6 +36,7 @@ public class AppConfiguration {
 
         UserService userService = new UserService();
         userService.setUserDao(userDAO());
+        userService.setDateSource(dataSource());
 
         return userService;
     }

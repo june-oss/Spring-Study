@@ -11,11 +11,14 @@ import com.june.tobyspring.user.domain.Level;
 import com.june.tobyspring.user.domain.User;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,6 +26,8 @@ import java.util.List;
 public class UserServiceTest {
     @Autowired private UserService userService;
     @Autowired private UserDaoJdbc userDao;
+    @Autowired
+    DataSource dataSource;
     List<User> users;
 
     @BeforeEach
@@ -42,7 +47,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeLevels() {
+    public void upgradeLevels() throws Exception {
         userDao.deleteAll();
         for(User user : users) userDao.add(user);
 
@@ -82,4 +87,40 @@ public class UserServiceTest {
 
     }
 
+    static class TestUserService extends UserService{
+        private  String id;
+
+        private TestUserService(String id){
+            this.id = id;
+        }
+
+        @Override
+        protected void upgradeLevel(User user) {
+            if (user.getId().equals(this.id))
+                throw new TestUserServiceException();
+            super.upgradeLevel(user);
+        }
+
+        static class TestUserServiceException extends RuntimeException {
+        }
+    }
+
+    @Test
+    public void upgradeAllOrNothing() throws Exception {
+        UserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(this.userDao);
+        testUserService.setDateSource(this.dataSource);
+
+        userDao.deleteAll();
+        for(User user : users) userDao.add(user);
+
+        try {
+            testUserService.upgradeLevels();
+            fail("TestUserServiceException expected");
+        }
+        catch (TestUserService.TestUserServiceException e){}
+
+        checkLevel(users.get(1),false);
+    }
 }
+
