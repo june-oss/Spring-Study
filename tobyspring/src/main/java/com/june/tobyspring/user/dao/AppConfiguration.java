@@ -1,13 +1,12 @@
 package com.june.tobyspring.user.dao;
 
 import com.june.tobyspring.user.service.DummyMailSender;
-import com.june.tobyspring.user.service.UserService;
+import com.june.tobyspring.user.service.UserServiceImpl;
+import com.june.tobyspring.user.service.UserServiceTx;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.transaction.TransactionManager;
 
 import javax.sql.DataSource;
 
@@ -36,11 +35,18 @@ public class AppConfiguration {
     }
 
     @Bean
-    public UserService userService(){
+    public UserServiceTx userService(){
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setTransactionManager(transactionManager());
+        userServiceTx.setUserService(userServiceImpl());
+        return userServiceTx;
+    }
 
-        UserService userService = new UserService();
+    @Bean
+    public UserServiceImpl userServiceImpl(){
+
+        UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDAO());
-        userService.setTransactionManager(transactionManager());
         userService.setMailSender(mailSender());
 
         return userService;
