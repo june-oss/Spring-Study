@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -29,16 +30,18 @@ public class UserServiceTest {
     @Autowired private UserDaoJdbc userDao;
     @Autowired
     PlatformTransactionManager transactionManager;
+    @Autowired
+    MailSender mailSender;
     List<User> users;
 
     @BeforeEach
     public void setUp(){
         users = Arrays.asList(
-                new User("bumjin", "박범진", "p1", Level.BASIC, UserService.MIN_LOGCOUNT_FOR_SILVER-1, 0),
-                new User("joytouch", "강명성", "p2", Level.BASIC, UserService.MIN_LOGCOUNT_FOR_SILVER, 0),
-                new User("erwins", "신승한", "p3", Level.SILVER, 60, UserService.MIN_RECOMMEND_FOR_GOLD-1),
-                new User("madnite1", "이상호", "p4", Level.SILVER, 60, UserService.MIN_RECOMMEND_FOR_GOLD),
-                new User("green", "오민규", "p5", Level.GOLD, 100, Integer.MAX_VALUE)
+                new User("bumjin", "박범진", "p1", "hj1@wafour.com", Level.BASIC, UserService.MIN_LOGCOUNT_FOR_SILVER-1, 0),
+                new User("joytouch", "강명성", "p2", "hj2@wafour.com", Level.BASIC, UserService.MIN_LOGCOUNT_FOR_SILVER, 0),
+                new User("erwins", "신승한", "p3", "hj3@wafour.com", Level.SILVER, 60, UserService.MIN_RECOMMEND_FOR_GOLD-1),
+                new User("madnite1", "이상호", "p4", "hj4@wafour.com", Level.SILVER, 60, UserService.MIN_RECOMMEND_FOR_GOLD),
+                new User("green", "오민규", "p5", "hj5@wafour.com", Level.GOLD, 100, Integer.MAX_VALUE)
         );
     }
 
@@ -111,7 +114,8 @@ public class UserServiceTest {
         UserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.userDao);
         testUserService.setTransactionManager(transactionManager);
-
+        testUserService.setMailSender(mailSender);
+        
         userDao.deleteAll();
         for(User user : users) userDao.add(user);
 

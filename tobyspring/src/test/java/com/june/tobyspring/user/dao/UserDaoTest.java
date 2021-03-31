@@ -27,6 +27,7 @@ public class UserDaoTest {
         assertThat(user1.getId(), is(user2.getId()));
         assertThat(user1.getName(), is(user2.getName()));
         assertThat(user1.getPassword(), is(user2.getPassword()));
+        assertThat(user1.getEmail(), is(user2.getEmail()));
         assertThat(user1.getLevel(), is(user2.getLevel()));
         assertThat(user1.getName(), is(user2.getName()));
         assertThat(user1.getPassword(),is(user2.getPassword()));
@@ -34,9 +35,9 @@ public class UserDaoTest {
 
     @BeforeEach //junit @Before와 동일 -- 각 테스트 메서드 전에 실행된다.
     public void setUp(){
-        this.user1 = new User("aaa", "최은정", "springno1", Level.BASIC, 1, 0);
-        this.user2 = new User("bbb", "이현중", "springno2", Level.SILVER, 55 ,10);
-        this.user3 = new User("ccc", "양우진", "springno3", Level.GOLD, 100,40);
+        this.user1 = new User("aaa", "최은정", "springno1", "hj@wafour.com", Level.BASIC, 1, 0);
+        this.user2 = new User("bbb", "이현중", "springno2", "hj@wafour.com", Level.SILVER, 55 ,10);
+        this.user3 = new User("ccc", "양우진", "springno3", "hj@wafour.com", Level.GOLD, 100,40);
     }
 
     @Test
@@ -125,6 +126,7 @@ public class UserDaoTest {
 
         user1.setName("오민규");
         user1.setPassword("springno6");
+        user1.setEmail("asdf@wafour.com");
         user1.setLevel(Level.GOLD);
         user1.setLogin(1000);
         user1.setRecommend(999);
