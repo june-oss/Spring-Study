@@ -1,5 +1,6 @@
 package com.june.tobyspring.user.dao;
 
+import springbook.learningtest.factorybean.MessageFactoryBean;
 import com.june.tobyspring.user.service.DummyMailSender;
 import com.june.tobyspring.user.service.UserServiceImpl;
 import com.june.tobyspring.user.service.UserServiceTx;
@@ -74,4 +75,5 @@ public class AppConfiguration {
         DummyMailSender dummyMailSender = new DummyMailSender();
         return dummyMailSender;
     }
+
 }
