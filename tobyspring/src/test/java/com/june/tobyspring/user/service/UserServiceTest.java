@@ -13,11 +13,13 @@ import com.june.tobyspring.user.domain.User;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
+import com.june.tobyspring.user.factorybean.TxProxyFactoryBean;
 import com.june.tobyspring.user.handler.TransactionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -36,6 +38,8 @@ public class UserServiceTest {
     @Autowired private UserDaoJdbc userDao;
     @Autowired PlatformTransactionManager transactionManager;
     @Autowired MailSender mailSender;
+    @Autowired
+    ApplicationContext context;
     List<User> users;
 
     @BeforeEach
@@ -134,13 +138,9 @@ public class UserServiceTest {
         testUserService.setUserDao(userDao);
         testUserService.setMailSender(mailSender);
 
-        TransactionHandler txHandler = new TransactionHandler();
-        txHandler.setTarget(testUserService);
-        txHandler.setTransactionManager(transactionManager);
-        txHandler.setPattern("upgradeLevels");
-        UserService txUserService = (UserService) Proxy.newProxyInstance(
-                getClass().getClassLoader(), new Class[] {UserService.class}, txHandler
-        );
+        TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+        txProxyFactoryBean.setTarget(testUserService);
+        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
 
 
         userDao.deleteAll();

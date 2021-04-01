@@ -1,5 +1,7 @@
 package com.june.tobyspring.user.dao;
 
+import com.june.tobyspring.user.factorybean.TxProxyFactoryBean;
+import com.june.tobyspring.user.service.UserService;
 import springbook.learningtest.factorybean.MessageFactoryBean;
 import com.june.tobyspring.user.service.DummyMailSender;
 import com.june.tobyspring.user.service.UserServiceImpl;
@@ -36,11 +38,13 @@ public class AppConfiguration {
     }
 
     @Bean
-    public UserServiceTx userService(){
-        UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setTransactionManager(transactionManager());
-        userServiceTx.setUserService(userServiceImpl());
-        return userServiceTx;
+    public TxProxyFactoryBean userService(){
+        TxProxyFactoryBean txProxyFactoryBean = new TxProxyFactoryBean();
+        txProxyFactoryBean.setTarget(userServiceImpl());
+        txProxyFactoryBean.setTransactionManager(transactionManager());
+        txProxyFactoryBean.setPattern("upgradeLevels");
+        txProxyFactoryBean.setServiceInterface(UserService.class);
+        return txProxyFactoryBean;
     }
 
     @Bean
