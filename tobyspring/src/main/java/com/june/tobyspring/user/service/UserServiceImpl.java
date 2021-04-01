@@ -16,12 +16,7 @@ public class UserServiceImpl implements UserService{
     public static final int MIN_RECOMMEND_FOR_GOLD = 30;
     UserDao userDao;
 
-    private PlatformTransactionManager transactionManager;
     private MailSender mailSender;
-
-    public void setTransactionManager(PlatformTransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
-    }
 
     public void setMailSender(MailSender mailSender) {
         this.mailSender = mailSender;
