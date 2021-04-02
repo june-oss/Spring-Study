@@ -1,7 +1,10 @@
 package com.june.tobyspring.user.dao;
 
-import com.june.tobyspring.user.factorybean.TxProxyFactoryBean;
+import com.june.tobyspring.user.handler.TransactionAdvice;
 import com.june.tobyspring.user.service.UserService;
+import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 import springbook.learningtest.factorybean.MessageFactoryBean;
 import com.june.tobyspring.user.service.DummyMailSender;
 import com.june.tobyspring.user.service.UserServiceImpl;
@@ -38,13 +41,11 @@ public class AppConfiguration {
     }
 
     @Bean
-    public TxProxyFactoryBean userService(){
-        TxProxyFactoryBean txProxyFactoryBean = new TxProxyFactoryBean();
-        txProxyFactoryBean.setTarget(userServiceImpl());
-        txProxyFactoryBean.setTransactionManager(transactionManager());
-        txProxyFactoryBean.setPattern("upgradeLevels");
-        txProxyFactoryBean.setServiceInterface(UserService.class);
-        return txProxyFactoryBean;
+    public ProxyFactoryBean userService(){
+        ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
+        proxyFactoryBean.setTarget(userServiceImpl());
+        proxyFactoryBean.setInterceptorNames("transactionAdvisor");
+        return proxyFactoryBean;
     }
 
     @Bean
@@ -64,6 +65,28 @@ public class AppConfiguration {
         transactionManager.setDataSource(dataSource());
 
         return transactionManager;
+    }
+
+    @Bean
+    public TransactionAdvice transactionAdvice(){
+        TransactionAdvice transactionAdvice = new TransactionAdvice();
+        transactionAdvice.setTransactionManager(transactionManager());
+        return transactionAdvice;
+    }
+
+    @Bean
+    public NameMatchMethodPointcut transactionPointcut(){
+        NameMatchMethodPointcut nameMatchMethodPointcut = new NameMatchMethodPointcut();
+        nameMatchMethodPointcut.setMappedName("upgrade*");
+        return nameMatchMethodPointcut;
+    }
+
+    @Bean
+    public DefaultBeanFactoryPointcutAdvisor transactionAdvisor(){
+        DefaultBeanFactoryPointcutAdvisor pointcutAdvisor = new DefaultBeanFactoryPointcutAdvisor();
+        pointcutAdvisor.setAdvice(transactionAdvice());
+        pointcutAdvisor.setPointcut(transactionPointcut());
+        return pointcutAdvisor;
     }
 
 //    @Bean
