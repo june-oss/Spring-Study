@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import javax.sql.DataSource;
-import java.sql.DriverManager;
 
 @Configuration
 public class DaoFactory {
@@ -29,8 +28,4 @@ public class DaoFactory {
         return userDAO;
     }
 
-    @Bean
-    public ConnectionMaker connectionMaker(){
-        return new DConnectionMaker();
-    }
 }

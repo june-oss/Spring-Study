@@ -1,11 +1,8 @@
 package com.june.tobyspring.dao;
 
 import com.june.tobyspring.domain.User;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import javax.security.auth.login.AccountNotFoundException;
 import javax.sql.DataSource;
 import java.sql.*;
 
@@ -61,14 +58,50 @@ public class UserDAO {
         return user;
     }
 
-    public void deleteAll() throws SQLException{
-        //예외가 발생하도 리소스를 반환하게 만들어야한다.
+//    public void deleteAll() throws SQLException{
+//        //예외가 발생하도 리소스를 반환하게 만들어야한다.
+//        Connection c = null;
+//        PreparedStatement ps = null;
+//
+//        try {
+//            c = dataSource.getConnection();
+//
+//            //TODO =====1. 변화는 부분과 변하지않는 부분을 분리시킨다. (관심사의분리??)
+//            ps = makeStatement(c);
+//            //=======
+//
+//            ps.executeUpdate();
+//        } catch (SQLException e){
+//            throw e;
+//        } finally {
+//            if( ps != null){
+//                try {
+//                    ps.close();
+//                } catch (SQLException e){}
+//            }
+//            if( c != null){
+//                try {
+//                    c.close();
+//                } catch (SQLException e) {}
+//            }
+//        }
+//    }
+//    private PreparedStatement makeStatement(Connection c ) throws SQLException{
+//        PreparedStatement ps;
+//        ps = c.prepareStatement("delete from users");
+//        return ps;
+//    }
+
+    public void deleteALl() throws SQLException{
         Connection c = null;
         PreparedStatement ps = null;
 
         try {
             c = dataSource.getConnection();
-            ps = c.prepareStatement("delete from users");
+
+            StatementStrategy strategy = new DeleteAllStatement();
+            ps = strategy.makePreparedStatement(c);
+
             ps.executeUpdate();
         } catch (SQLException e){
             throw e;
@@ -84,13 +117,7 @@ public class UserDAO {
                 } catch (SQLException e) {}
             }
         }
-        //use try resourc with
-//        try(Connection c = dataSource.getConnection();
-//            PreparedStatement ps = c.prepareStatement("delete from users")){
-//            ps.executeUpdate();
-//        } catch (SQLException e){
-//            throw e;
-//        }
+
     }
 
     public int getCount() throws SQLException{
