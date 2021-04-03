@@ -62,14 +62,35 @@ public class UserDAO {
     }
 
     public void deleteAll() throws SQLException{
-        Connection c = dataSource.getConnection();
+        //예외가 발생하도 리소스를 반환하게 만들어야한다.
+        Connection c = null;
+        PreparedStatement ps = null;
 
-        PreparedStatement ps = c.prepareStatement("delete from users");
-
-        ps.executeUpdate();
-
-        ps.close();
-        c.close();
+        try {
+            c = dataSource.getConnection();
+            ps = c.prepareStatement("delete from users");
+            ps.executeUpdate();
+        } catch (SQLException e){
+            throw e;
+        } finally {
+            if( ps != null){
+                try {
+                    ps.close();
+                } catch (SQLException e){}
+            }
+            if( c != null){
+                try {
+                    c.close();
+                } catch (SQLException e) {}
+            }
+        }
+        //use try resourc with
+//        try(Connection c = dataSource.getConnection();
+//            PreparedStatement ps = c.prepareStatement("delete from users")){
+//            ps.executeUpdate();
+//        } catch (SQLException e){
+//            throw e;
+//        }
     }
 
     public int getCount() throws SQLException{
