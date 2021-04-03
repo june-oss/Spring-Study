@@ -4,11 +4,13 @@ import com.june.tobyspring.dao.UserDaoJdbc;
 import com.june.tobyspring.handler.TransactionAdvice;
 import com.june.tobyspring.service.DummyMailSender;
 import com.june.tobyspring.service.UserServiceImpl;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import springbook.learningtest.jdk.proxy.NameMatchClassMethodPointcut;
@@ -16,6 +18,7 @@ import springbook.learningtest.jdk.proxy.NameMatchClassMethodPointcut;
 import javax.sql.DataSource;
 
 @Configuration
+@EnableAspectJAutoProxy
 public class AppConfiguration {
 
     @Bean
@@ -66,11 +69,11 @@ public class AppConfiguration {
     }
 
     @Bean
-    public NameMatchClassMethodPointcut transactionPointcut(){
-        NameMatchClassMethodPointcut nameMatchMethodPointcut = new NameMatchClassMethodPointcut();
-        nameMatchMethodPointcut.setMappedClassName("*ServiceImpl");
-        nameMatchMethodPointcut.setMappedName("upgrade*");
-        return nameMatchMethodPointcut;
+    public AspectJExpressionPointcut transactionPointcut(){
+        AspectJExpressionPointcut aspectJExpressionPointcut = new AspectJExpressionPointcut();
+        aspectJExpressionPointcut.setExpression("execution(* *..*ServiceImpl .upgrade*(,,))");
+
+        return aspectJExpressionPointcut;
     }
 
     @Bean

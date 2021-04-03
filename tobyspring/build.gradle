@@ -22,6 +22,8 @@ dependencies {
 	implementation group: 'org.springframework', name: 'spring-context-support'
 	implementation group: 'org.springframework', name: 'spring-aop'
 	implementation group: 'spring', name: 'spring-aopalliance'
+	implementation group: 'org.aspectj', name: 'aspectjtools'
+
 }
 
 test {
