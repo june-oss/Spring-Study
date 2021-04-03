@@ -10,10 +10,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 public class UserDAO {
-
-//    private SimpleConnectionMaker SimpleConnectionMakernectionMaker;
-    //인터페이스 이용
-    private DataSource dataSource; //초기에 설정하면 사용중에 변화지 않는 읽기전용 인스턴스 변수.
+    private DataSource dataSource;
 
     public UserDAO(){};
 
@@ -22,14 +19,11 @@ public class UserDAO {
     }
 
     public UserDAO(DataSource dataSource){
-//        simpleConnectionMaker = new SimpleConnectionMaker();
-//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         this.dataSource = dataSource;
     }
 
 
     public void add(User user) throws SQLException{
-//        Connection c = simpleConnectionMaker.makeNewConnection();
         Connection c = dataSource.getConnection();
 
         PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
@@ -44,7 +38,6 @@ public class UserDAO {
     }
 
     public User get(String id) throws SQLException{
-//        Connection c = simpleConnectionMaker.makeNewConnection();
         Connection c = dataSource.getConnection();
 
         PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
@@ -66,7 +59,6 @@ public class UserDAO {
         if (user == null) throw new EmptyResultDataAccessException(1);
 
         return user;
-
     }
 
     public void deleteAll() throws SQLException{
@@ -95,33 +87,4 @@ public class UserDAO {
 
         return count;
     }
-
-//    //중복 코드의 메소드 추출
-//    private Connection getConnection() throws ClassNotFoundException, SQLException{
-//        Class.forName("com.mysql.cj.jdbc.Driver");
-//        Connection c = DriverManager.getConnection(
-//                "jdbc:mysql://localhost/study?serverTimezone=UTC", "toby", "1234");
-//
-//        return  c;
-//    }
-
-    //테스트용 main()메서드
-//    public static void main(String[] args) throws ClassNotFoundException, SQLException{
-//        UserDAO dao = new UserDAO();
-//
-//        User user = new User();
-//        user.setId("mlicp");
-//        user.setName("이현중");
-//        user.setPassword("1234");
-//
-//        dao.add(user);
-//
-//        System.out.println(user.getId() + " 등록 성공");
-//
-//        User user2 = dao.get(user.getId());
-//        System.out.println(user2.getName());
-//        System.out.println(user2.getPassword());
-//
-//        System.out.println(user2.getId() + " 조회 성공");
-//    }
 }

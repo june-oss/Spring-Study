@@ -18,25 +18,17 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.sql.SQLException;
 
-//@ExtendWith(SpringExtension.class)  //@RunWith(SpringJUnitClassRunner.class)
 @SpringJUnitConfig(DaoFactory.class)//@ContextConfiguration
-//@DirtiesContext //테스트메소드에서 application context구성이나 상태를 변경하는다는 것을 tesxcontext framework에 알려줌
 public class UserDAOTest {
-//    @Autowired
-//    private ApplicationContext context;
-//    아래처럼 userDAO를 직접 주입받는다.
     @Autowired
     private UserDAO dao;
     private User user1, user2, user3;
 
-    @BeforeEach //junit @Before와 동일 -- 각 테스트 메서드 전에 실행된다.
+    @BeforeEach
     public void setUp(){
         System.out.println("==========================================");
-//        System.out.println(this.context);
         System.out.println(this);
         System.out.println("==========================================");
-
-//        this.dao = this.context.getBean("userDAO", UserDAO.class);
 
         this.user1 = new User("aaa", "최은정", "springno1");
         this.user2 = new User("bbb", "이현중", "springno2");
@@ -46,19 +38,9 @@ public class UserDAOTest {
 
     @Test
     void addAndGet() throws SQLException {
-//        ConnectionMaker connectionMaker = new DConnectionMaker();
-//        UserDAO dao = new DaoFactory().userDAO();
-//        User user1 = new User("111", "김현중", "springno1");
-//        User user2 = new User("222", "최은정", "springno2");
-
         dao.deleteAll();
 
         assertEquals(dao.getCount(), 0);
-
-//        User user = new User();
-//        user.setId("mlicp");
-//        user.setName("이현중");
-//        user.setPassword("1234");
 
         dao.add(user1);
         dao.add(user2);
@@ -76,13 +58,6 @@ public class UserDAOTest {
 
     @Test
     public void count() throws SQLException{
-//        setUp()메소드로 분리
-//        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-//        UserDAO dao = context.getBean("userDAO", UserDAO.class);
-//        User user1 = new User("aaa", "최은정", "springno1");
-//        User user2 = new User("bbb", "이현중", "springno2");
-//        User user3 = new User("ccc", "양우진", "springno3");
-
         dao.deleteAll();
         assertEquals(dao.getCount(), 0);
 
@@ -98,10 +73,6 @@ public class UserDAOTest {
 
     @Test
     public void getUserFailure() throws SQLException{
-//        setUp()메소드로 분리
-//        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-//        UserDAO dao = context.getBean("userDAO", UserDAO.class);
-
         dao.deleteAll();
         assertEquals(dao.getCount(), 0);
 
@@ -109,6 +80,4 @@ public class UserDAOTest {
             User user = dao.get("unknown_id");
         });
     }
-
-
 }
