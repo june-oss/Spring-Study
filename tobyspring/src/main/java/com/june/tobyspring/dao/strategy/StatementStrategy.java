@@ -1,4 +1,4 @@
-package com.june.tobyspring.dao;
+package com.june.tobyspring.dao.strategy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

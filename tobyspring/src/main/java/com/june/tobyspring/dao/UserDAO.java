@@ -1,5 +1,8 @@
 package com.june.tobyspring.dao;
 
+import com.june.tobyspring.dao.strategy.AddStatement;
+import com.june.tobyspring.dao.strategy.DeleteAllStatement;
+import com.june.tobyspring.dao.strategy.StatementStrategy;
 import com.june.tobyspring.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -21,23 +24,14 @@ public class UserDAO {
 
 
     public void add(User user) throws SQLException{
-        Connection c = dataSource.getConnection();
-
-        PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
-        ps.setString(1, user.getId());
-        ps.setString(2, user.getName());
-        ps.setString(3, user.getPassword());
-
-        ps.executeUpdate();
-
-        ps.close();
-        c.close();
+        StatementStrategy st = new AddStatement(user);
+        jdbcContextWithStatementStrategy(st);
     }
 
     public User get(String id) throws SQLException{
         Connection c = dataSource.getConnection();
 
-        PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
+        PreparedStatement ps = c.prepareStatement("select * from usersTest where id = ?");
         ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
@@ -58,72 +52,16 @@ public class UserDAO {
         return user;
     }
 
-//    public void deleteAll() throws SQLException{
-//        //예외가 발생하도 리소스를 반환하게 만들어야한다.
-//        Connection c = null;
-//        PreparedStatement ps = null;
-//
-//        try {
-//            c = dataSource.getConnection();
-//
-//            //TODO =====1. 변화는 부분과 변하지않는 부분을 분리시킨다. (관심사의분리??)
-//            ps = makeStatement(c);
-//            //=======
-//
-//            ps.executeUpdate();
-//        } catch (SQLException e){
-//            throw e;
-//        } finally {
-//            if( ps != null){
-//                try {
-//                    ps.close();
-//                } catch (SQLException e){}
-//            }
-//            if( c != null){
-//                try {
-//                    c.close();
-//                } catch (SQLException e) {}
-//            }
-//        }
-//    }
-//    private PreparedStatement makeStatement(Connection c ) throws SQLException{
-//        PreparedStatement ps;
-//        ps = c.prepareStatement("delete from users");
-//        return ps;
-//    }
-
-    public void deleteALl() throws SQLException{
-        Connection c = null;
-        PreparedStatement ps = null;
-
-        try {
-            c = dataSource.getConnection();
-
-            StatementStrategy strategy = new DeleteAllStatement();
-            ps = strategy.makePreparedStatement(c);
-
-            ps.executeUpdate();
-        } catch (SQLException e){
-            throw e;
-        } finally {
-            if( ps != null){
-                try {
-                    ps.close();
-                } catch (SQLException e){}
-            }
-            if( c != null){
-                try {
-                    c.close();
-                } catch (SQLException e) {}
-            }
-        }
-
+    public void deleteAll() throws SQLException{
+        StatementStrategy st = new DeleteAllStatement(); //전략클래스의 오브젝트 생성
+        jdbcContextWithStatementStrategy(st);   //컨텍스트 호출 및 전략 오브젝트 전달
+        //비록 클라이언트와 컨텍스트는 클래스를 분리하지 않았지만, 의존관계와 책임으로 볼 때 이상적인 관계를 가지고있다.
     }
 
     public int getCount() throws SQLException{
         Connection c = dataSource.getConnection();
 
-        PreparedStatement ps = c.prepareStatement("select count(*) from users");
+        PreparedStatement ps = c.prepareStatement("select count(*) from usersTest");
 
         ResultSet rs = ps.executeQuery();
         rs.next();
@@ -134,5 +72,23 @@ public class UserDAO {
         c.close();
 
         return count;
+    }
+
+    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException{
+        Connection c = null;
+        PreparedStatement ps = null;
+
+        try{
+            c = dataSource.getConnection();
+
+            ps = stmt.makePreparedStatement(c);
+
+            ps.executeUpdate();
+        }  catch (SQLException e){
+            throw e;
+        } finally {
+            if( ps != null){ try { ps.close(); } catch (SQLException e){} }
+            if( c != null){ try { c.close(); } catch (SQLException e) {} }
+        }
     }
 }
