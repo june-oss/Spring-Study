@@ -1,7 +1,5 @@
 package com.june.tobyspring.dao;
 
-import com.june.tobyspring.dao.strategy.AddStatement;
-import com.june.tobyspring.dao.strategy.DeleteAllStatement;
 import com.june.tobyspring.dao.strategy.StatementStrategy;
 import com.june.tobyspring.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -11,21 +9,32 @@ import java.sql.*;
 
 public class UserDAO {
     private DataSource dataSource;
+    private JdbcContext jdbcContext;
 
     public UserDAO(){};
 
     public void setDataSource(DataSource dataSource) {
+        this.jdbcContext = new JdbcContext();
+
+        this.jdbcContext.setDataSource(dataSource);
+
         this.dataSource = dataSource;
     }
 
-    public UserDAO(DataSource dataSource){
-        this.dataSource = dataSource;
-    }
+    public void add(final User user) throws SQLException{
+        this.jdbcContext.workWithStatementStrategy(
+                new StatementStrategy() {
+                    @Override
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        PreparedStatement ps = c.prepareStatement("insert into usersTest(id, name, password) values(?,?,?)");
+                        ps.setString(1, user.getId());
+                        ps.setString(2, user.getName());
+                        ps.setString(3, user.getPassword());
 
-
-    public void add(User user) throws SQLException{
-        StatementStrategy st = new AddStatement(user);
-        jdbcContextWithStatementStrategy(st);
+                        return ps;
+                    }
+                }
+        );
     }
 
     public User get(String id) throws SQLException{
@@ -53,9 +62,14 @@ public class UserDAO {
     }
 
     public void deleteAll() throws SQLException{
-        StatementStrategy st = new DeleteAllStatement(); //전략클래스의 오브젝트 생성
-        jdbcContextWithStatementStrategy(st);   //컨텍스트 호출 및 전략 오브젝트 전달
-        //비록 클라이언트와 컨텍스트는 클래스를 분리하지 않았지만, 의존관계와 책임으로 볼 때 이상적인 관계를 가지고있다.
+        this.jdbcContext.workWithStatementStrategy(
+                new StatementStrategy() {
+                    @Override
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        return c.prepareStatement("delete from users");
+                    }
+                }
+        );
     }
 
     public int getCount() throws SQLException{
