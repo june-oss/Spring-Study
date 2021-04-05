@@ -1,8 +1,7 @@
 package com.june.tobyspring.dao;
 
-import com.june.tobyspring.dao.CountingConnectionMaker;
-import com.june.tobyspring.dao.CountingDaoFactory;
-import com.june.tobyspring.dao.UserDaoJdbc;
+import com.june.tobyspring.dao.connectionmaker.CountingConnectionMaker;
+import com.june.tobyspring.dao.connectionmaker.CountingDaoFactory;
 import com.june.tobyspring.domain.User;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

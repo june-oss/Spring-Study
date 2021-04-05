@@ -1,4 +1,6 @@
-package com.june.tobyspring.dao;
+package com.june.tobyspring.dao.connectionmaker;
+
+import com.june.tobyspring.dao.connectionmaker.ConnectionMaker;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -1,24 +1,21 @@
 package com.june.tobyspring.config;
 
 import com.june.tobyspring.dao.UserDaoJdbc;
-import com.june.tobyspring.handler.TransactionAdvice;
 import com.june.tobyspring.service.DummyMailSender;
 import com.june.tobyspring.service.UserServiceImpl;
-import org.springframework.aop.aspectj.AspectJExpressionPointcut;
-import org.springframework.aop.framework.ProxyFactoryBean;
-import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
-import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
-import springbook.learningtest.jdk.proxy.NameMatchClassMethodPointcut;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
 @Configuration
 @EnableAspectJAutoProxy
+@EnableTransactionManagement
 public class AppConfiguration {
 
     @Bean
@@ -52,36 +49,14 @@ public class AppConfiguration {
         return userService;
     }
 
+
     @Bean
-    public DataSourceTransactionManager transactionManager(){
+    public PlatformTransactionManager transactionManager(){
 
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
         transactionManager.setDataSource(dataSource());
 
         return transactionManager;
-    }
-
-    @Bean
-    public TransactionAdvice transactionAdvice(){
-        TransactionAdvice transactionAdvice = new TransactionAdvice();
-        transactionAdvice.setTransactionManager(transactionManager());
-        return transactionAdvice;
-    }
-
-    @Bean
-    public AspectJExpressionPointcut transactionPointcut(){
-        AspectJExpressionPointcut aspectJExpressionPointcut = new AspectJExpressionPointcut();
-        aspectJExpressionPointcut.setExpression("execution(* *..*ServiceImpl .upgrade*(,,))");
-
-        return aspectJExpressionPointcut;
-    }
-
-    @Bean
-    public DefaultBeanFactoryPointcutAdvisor transactionAdvisor(){
-        DefaultBeanFactoryPointcutAdvisor pointcutAdvisor = new DefaultBeanFactoryPointcutAdvisor();
-        pointcutAdvisor.setAdvice(transactionAdvice());
-        pointcutAdvisor.setPointcut(transactionPointcut());
-        return pointcutAdvisor;
     }
 
 //    @Bean

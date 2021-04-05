@@ -10,6 +10,7 @@ import com.june.tobyspring.dao.UserDaoJdbc;
 import com.june.tobyspring.domain.Level;
 import com.june.tobyspring.domain.User;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
@@ -25,6 +26,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +35,7 @@ import java.util.List;
 
 @SpringJUnitConfig(AppConfiguration.class)
 public class UserServiceTest {
-    @Autowired private UserServiceImpl userServiceImpl;
+    @Autowired private UserService userService;
     @Autowired private UserDaoJdbc userDao;
     @Autowired PlatformTransactionManager transactionManager;
     @Autowired MailSender mailSender;
@@ -53,7 +56,7 @@ public class UserServiceTest {
 
     @Test
     public void bean(){
-        assertThat(this.userServiceImpl, is(notNullValue()));
+        assertThat(this.userService, is(notNullValue()));
     }
 
     @Test
@@ -101,8 +104,8 @@ public class UserServiceTest {
         User userWithoutLevel = users.get(0);
         userWithoutLevel.setLevel(null);
 
-        userServiceImpl.add(userWithLevel);
-        userServiceImpl.add(userWithoutLevel);
+        userService.add(userWithLevel);
+        userService.add(userWithoutLevel);
 
         User userWithLevelRead = userDao.get(userWithLevel.getId());
         User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
@@ -182,6 +185,25 @@ public class UserServiceTest {
         List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
         assertThat(mailMessages.get(0).getTo()[0], is(users.get(1).getEmail()));
         assertThat(mailMessages.get(1).getTo()[0], is(users.get(3).getEmail()));
+    }
+
+    @Test
+    public void transactionSync() {
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCount());
+
+        DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();
+        TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
+
+        userService.deleteAll();
+
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+        assertEquals(2, userDao.getCount());
+
+        transactionManager.rollback(txStatus);
+
+        assertEquals(0, userDao.getCount());
     }
 
     static class MockMailSender implements MailSender{

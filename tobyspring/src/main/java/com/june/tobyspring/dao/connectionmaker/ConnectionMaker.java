@@ -1,4 +1,4 @@
-package com.june.tobyspring.dao;
+package com.june.tobyspring.dao.connectionmaker;
 
 import java.sql.Connection;
 import java.sql.SQLException;

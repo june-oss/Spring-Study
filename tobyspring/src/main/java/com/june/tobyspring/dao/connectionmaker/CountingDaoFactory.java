@@ -1,5 +1,6 @@
-package com.june.tobyspring.dao;
+package com.june.tobyspring.dao.connectionmaker;
 
+import com.june.tobyspring.dao.UserDaoJdbc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
