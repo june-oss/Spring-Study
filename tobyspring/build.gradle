@@ -23,7 +23,10 @@ dependencies {
 	implementation group: 'org.springframework', name: 'spring-aop'
 	implementation group: 'spring', name: 'spring-aopalliance'
 	implementation group: 'org.aspectj', name: 'aspectjtools'
-
+	implementation group: 'javax.xml.bind', name: 'jaxb-api'
+	implementation group: 'javax.jws', name: 'jsr181-api'
+	implementation group: 'javax.xml.ws', name: 'jaxws-api'
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime'
 }
 
 test {

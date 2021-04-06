@@ -3,6 +3,7 @@ package com.june.tobyspring.config;
 import com.june.tobyspring.dao.UserDaoJdbc;
 import com.june.tobyspring.service.DummyMailSender;
 import com.june.tobyspring.service.UserServiceImpl;
+import com.june.tobyspring.sqlservice.SimpleSqlService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -34,21 +35,25 @@ public class AppConfiguration {
 
     @Bean
     public UserDaoJdbc userDAO(){
-
         UserDaoJdbc userDAO = new UserDaoJdbc();
         userDAO.setDataSource(dataSource());
-        Map<String, String> sqlMap = new HashMap<>();
-        sqlMap.put("add", "insety into users(id, name, password, email, level, login, recommend) values(?,?,?,?,?,?,?)");
-        sqlMap.put("get","select * from users where id = ?");
-        sqlMap.put("getAll","select * from users order by id");
-        sqlMap.put("deleteAll","delete from users");
-        sqlMap.put("getCount","select count(*) from users");
-        sqlMap.put("update","update users set name = ?, password = ?, email = ?, level = ?, login = ?, recommend = ? where id =?");
-        userDAO.setSqlMap();
-
+        userDAO.setSqlService(sqlService());
         return userDAO;
     }
 
+    @Bean
+    public SimpleSqlService sqlService(){
+        SimpleSqlService sqlService = new SimpleSqlService();
+        Map<String, String> sqlMap = new HashMap<>();
+        sqlMap.put("userAdd", "insert into users(id, name, password, email, level, login, recommend) values(?,?,?,?,?,?,?)");
+        sqlMap.put("userGet","select * from users where id = ?");
+        sqlMap.put("userGetAll","select * from users order by id");
+        sqlMap.put("userDeleteAll","delete from users");
+        sqlMap.put("userGetCount","select count(*) from users");
+        sqlMap.put("userUpdate","update users set name = ?, password = ?, email = ?, level = ?, login = ?, recommend = ? where id =?");
+        sqlService.setSqlMap(sqlMap);
+        return sqlService;
+    }
     @Bean
     public UserServiceImpl userService(){
 
