@@ -12,6 +12,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -35,6 +37,14 @@ public class AppConfiguration {
 
         UserDaoJdbc userDAO = new UserDaoJdbc();
         userDAO.setDataSource(dataSource());
+        Map<String, String> sqlMap = new HashMap<>();
+        sqlMap.put("add", "insety into users(id, name, password, email, level, login, recommend) values(?,?,?,?,?,?,?)");
+        sqlMap.put("get","select * from users where id = ?");
+        sqlMap.put("getAll","select * from users order by id");
+        sqlMap.put("deleteAll","delete from users");
+        sqlMap.put("getCount","select count(*) from users");
+        sqlMap.put("update","update users set name = ?, password = ?, email = ?, level = ?, login = ?, recommend = ? where id =?");
+        userDAO.setSqlMap();
 
         return userDAO;
     }
