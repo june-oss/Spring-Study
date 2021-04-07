@@ -1,5 +1,6 @@
 package com.june.tobyspring.dao;
 
+import com.june.tobyspring.config.AppConfiguration;
 import com.june.tobyspring.domain.User;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.sql.SQLException;
 
-@SpringJUnitConfig(DaoFactory.class)//@ContextConfiguration
+@SpringJUnitConfig(AppConfiguration.class)//@ContextConfiguration
 public class UserDAOTest {
     @Autowired
     private UserDAO dao;
