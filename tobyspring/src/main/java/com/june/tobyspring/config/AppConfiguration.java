@@ -1,10 +1,13 @@
 package com.june.tobyspring.config;
 
+import com.june.tobyspring.dao.UserDao;
 import com.june.tobyspring.dao.UserDaoJdbc;
 import com.june.tobyspring.service.DummyMailSender;
 import com.june.tobyspring.service.UserServiceImpl;
 import com.june.tobyspring.sqlservice.SimpleSqlService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -17,9 +20,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EnableAspectJAutoProxy
 @EnableTransactionManagement
+@ComponentScan(basePackages = "com.june.tobyspring")
 public class AppConfiguration {
+
+    @Autowired
+    UserDao userdao;
 
     @Bean
     public DataSource dataSource(){
@@ -31,14 +37,6 @@ public class AppConfiguration {
         dataSource.setPassword("1234");
 
         return dataSource;
-    }
-
-    @Bean
-    public UserDaoJdbc userDAO(){
-        UserDaoJdbc userDAO = new UserDaoJdbc();
-        userDAO.setDataSource(dataSource());
-        userDAO.setSqlService(sqlService());
-        return userDAO;
     }
 
     @Bean
@@ -54,16 +52,6 @@ public class AppConfiguration {
         sqlService.setSqlMap(sqlMap);
         return sqlService;
     }
-    @Bean
-    public UserServiceImpl userService(){
-
-        UserServiceImpl userService = new UserServiceImpl();
-        userService.setUserDao(userDAO());
-        userService.setMailSender(mailSender());
-
-        return userService;
-    }
-
 
     @Bean
     public PlatformTransactionManager transactionManager(){
@@ -73,14 +61,6 @@ public class AppConfiguration {
 
         return transactionManager;
     }
-
-//    @Bean
-//    public JavaMailSenderImpl mailSender(){
-//        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-//        javaMailSender.setHost("mail.server.com");
-//
-//        return javaMailSender;
-//    }
 
     @Bean //forTest
     public DummyMailSender mailSender(){

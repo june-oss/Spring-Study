@@ -4,8 +4,10 @@ import com.june.tobyspring.domain.Level;
 
 import com.june.tobyspring.domain.User;
 import com.june.tobyspring.sqlservice.SqlService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -13,10 +15,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class UserDaoJdbc implements UserDao {
+
     private JdbcTemplate jdbcTemplate;
     private String sqlAdd;
 
+    @Autowired
     private SqlService sqlService;
 
     public void setSqlService(SqlService sqlService){
@@ -29,6 +34,7 @@ public class UserDaoJdbc implements UserDao {
         this.sqlAdd = sqlAdd;
     }
 
+    @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

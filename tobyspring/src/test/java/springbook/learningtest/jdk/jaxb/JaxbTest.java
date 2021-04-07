@@ -1,7 +1,7 @@
 package springbook.learningtest.jdk.jaxb;
 
-import com.june.tobyspring.sqlservice.SqlType;
-import com.june.tobyspring.sqlservice.*;
+import com.june.tobyspring.sqlservice.jaxb.SqlType;
+import com.june.tobyspring.sqlservice.jaxb.Sqlmap;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.bind.JAXBContext;
@@ -15,15 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JaxbTest {
     @Test
     public void readSqlmap() throws JAXBException, IOException{
-        String contextPath = Sqlmap.class.getPackage().getName();
+        String contextPath =Sqlmap.class.getPackage().getName();
 
         JAXBContext context = JAXBContext.newInstance(contextPath);
         Unmarshaller unmarshaller = context.createUnmarshaller();
 
-        Sqlmap sqlmap = (Sqlmap) unmarshaller.unmarshal(
-                getClass().getResourceAsStream("sqlmap.xml")
-        );
-
+        System.out.println(getClass().getResourceAsStream("sqlmap.xml"));
+        Sqlmap sqlmap = (Sqlmap) unmarshaller.unmarshal(getClass().getResourceAsStream("sqlmap.xml"));
         List<SqlType> sqlList = sqlmap.getSql();
 
         assertEquals(3, sqlList.size());
